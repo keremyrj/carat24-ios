@@ -84,8 +84,8 @@ jobs:
 
       - name: Upload to App Store Connect
         env:
-          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
-          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_ID: 96YZ8J3WBV
+          ASC_ISSUER_ID: 1b6ed897-12c2-411c-a85a-181f823db867
           ASC_PRIVATE_KEY: ${{ secrets.ASC_PRIVATE_KEY }}
         run: |
           mkdir -p "$HOME/.appstoreconnect/private_keys"
