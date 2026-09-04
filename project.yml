@@ -1,0 +1,31 @@
+name: Carat24
+options:
+  bundleIdPrefix: com.ceremybilisim
+  deploymentTarget:
+    iOS: "16.0"
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+targets:
+  Carat24:
+    type: application
+    platform: iOS
+    sources:
+      - path: Carat24
+        excludes:
+          - Resources
+    resources:
+      - path: Carat24/Resources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.ceremybilisim.carat24
+        PRODUCT_NAME: Carat24
+        INFOPLIST_FILE: Carat24/Resources/Info.plist
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        CODE_SIGN_STYLE: Automatic
+        TARGETED_DEVICE_FAMILY: "1,2"
+    scheme:
+      testTargets: []
