@@ -115,6 +115,38 @@ jobs:
             ASSETCATALOG_COMPILER_APPICON_NAME=AppIcon \
             INFOPLIST_KEY_CFBundleIconName=AppIcon
 
+      - name: Ensure icons are embedded in archive
+        run: |
+          APP_PATH="$RUNNER_TEMP/Carat24.xcarchive/Products/Applications/Carat24.app"
+          COMPILED_ASSETS="$RUNNER_TEMP/compiled-assets"
+          PARTIAL_PLIST="$RUNNER_TEMP/asset-info.plist"
+          ENTITLEMENTS="$RUNNER_TEMP/Carat24.entitlements"
+          KEYCHAIN_PATH="$RUNNER_TEMP/app-signing.keychain-db"
+
+          mkdir -p "$COMPILED_ASSETS"
+          xcrun actool "Carat24/Resources/Assets.xcassets" \
+            --compile "$COMPILED_ASSETS" \
+            --platform iphoneos \
+            --minimum-deployment-target 16.0 \
+            --target-device iphone \
+            --app-icon AppIcon \
+            --output-partial-info-plist "$PARTIAL_PLIST"
+
+          cp -R "$COMPILED_ASSETS/." "$APP_PATH/"
+          /usr/libexec/PlistBuddy -c "Merge $PARTIAL_PLIST" "$APP_PATH/Info.plist"
+          if /usr/libexec/PlistBuddy -c "Print :CFBundleIconName" "$APP_PATH/Info.plist" >/dev/null 2>&1; then
+            /usr/libexec/PlistBuddy -c "Set :CFBundleIconName AppIcon" "$APP_PATH/Info.plist"
+          else
+            /usr/libexec/PlistBuddy -c "Add :CFBundleIconName string AppIcon" "$APP_PATH/Info.plist"
+          fi
+
+          codesign -d --entitlements :- "$APP_PATH" > "$ENTITLEMENTS" 2>/dev/null
+          SIGNING_IDENTITY=$(security find-identity -v -p codesigning "$KEYCHAIN_PATH" | awk 'NR==1 {print $2}')
+          codesign --force --sign "$SIGNING_IDENTITY" --entitlements "$ENTITLEMENTS" "$APP_PATH"
+
+          /usr/libexec/PlistBuddy -c "Print :CFBundleIconName" "$APP_PATH/Info.plist"
+          find "$APP_PATH" -maxdepth 1 \( -name 'Assets.car' -o -name 'AppIcon*.png' \) -print
+
       - name: Create export settings
         run: |
           cat > "$RUNNER_TEMP/ExportOptions.plist" <<'PLIST'
