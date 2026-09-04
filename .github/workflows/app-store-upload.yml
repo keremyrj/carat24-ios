@@ -12,6 +12,67 @@ jobs:
       - name: Install XcodeGen
         run: brew install xcodegen
 
+      - name: Prepare App Store icons
+        run: |
+          PLIST="Carat24/Resources/Info.plist"
+          ICON_DIR="Carat24/Resources/Assets.xcassets/AppIcon.appiconset"
+          SOURCE_ICON="$ICON_DIR/Carat24-AppIcon-1024.png"
+
+          if /usr/libexec/PlistBuddy -c "Print :CFBundleIconName" "$PLIST" >/dev/null 2>&1; then
+            /usr/libexec/PlistBuddy -c "Set :CFBundleIconName AppIcon" "$PLIST"
+          else
+            /usr/libexec/PlistBuddy -c "Add :CFBundleIconName string AppIcon" "$PLIST"
+          fi
+
+          make_icon() {
+            cp "$SOURCE_ICON" "$ICON_DIR/$1"
+            sips -z "$2" "$2" "$ICON_DIR/$1" >/dev/null
+          }
+
+          make_icon "Icon-iPhone-20@2x.png" 40
+          make_icon "Icon-iPhone-20@3x.png" 60
+          make_icon "Icon-iPhone-29@2x.png" 58
+          make_icon "Icon-iPhone-29@3x.png" 87
+          make_icon "Icon-iPhone-40@2x.png" 80
+          make_icon "Icon-iPhone-40@3x.png" 120
+          make_icon "Icon-iPhone-60@2x.png" 120
+          make_icon "Icon-iPhone-60@3x.png" 180
+          make_icon "Icon-iPad-20.png" 20
+          make_icon "Icon-iPad-20@2x.png" 40
+          make_icon "Icon-iPad-29.png" 29
+          make_icon "Icon-iPad-29@2x.png" 58
+          make_icon "Icon-iPad-40.png" 40
+          make_icon "Icon-iPad-40@2x.png" 80
+          make_icon "Icon-iPad-76.png" 76
+          make_icon "Icon-iPad-76@2x.png" 152
+          make_icon "Icon-iPad-83.5@2x.png" 167
+
+          cat > "$ICON_DIR/Contents.json" <<'JSON'
+          {
+            "images": [
+              { "filename": "Icon-iPhone-20@2x.png", "idiom": "iphone", "scale": "2x", "size": "20x20" },
+              { "filename": "Icon-iPhone-20@3x.png", "idiom": "iphone", "scale": "3x", "size": "20x20" },
+              { "filename": "Icon-iPhone-29@2x.png", "idiom": "iphone", "scale": "2x", "size": "29x29" },
+              { "filename": "Icon-iPhone-29@3x.png", "idiom": "iphone", "scale": "3x", "size": "29x29" },
+              { "filename": "Icon-iPhone-40@2x.png", "idiom": "iphone", "scale": "2x", "size": "40x40" },
+              { "filename": "Icon-iPhone-40@3x.png", "idiom": "iphone", "scale": "3x", "size": "40x40" },
+              { "filename": "Icon-iPhone-60@2x.png", "idiom": "iphone", "scale": "2x", "size": "60x60" },
+              { "filename": "Icon-iPhone-60@3x.png", "idiom": "iphone", "scale": "3x", "size": "60x60" },
+              { "filename": "Icon-iPad-20.png", "idiom": "ipad", "scale": "1x", "size": "20x20" },
+              { "filename": "Icon-iPad-20@2x.png", "idiom": "ipad", "scale": "2x", "size": "20x20" },
+              { "filename": "Icon-iPad-29.png", "idiom": "ipad", "scale": "1x", "size": "29x29" },
+              { "filename": "Icon-iPad-29@2x.png", "idiom": "ipad", "scale": "2x", "size": "29x29" },
+              { "filename": "Icon-iPad-40.png", "idiom": "ipad", "scale": "1x", "size": "40x40" },
+              { "filename": "Icon-iPad-40@2x.png", "idiom": "ipad", "scale": "2x", "size": "40x40" },
+              { "filename": "Icon-iPad-76.png", "idiom": "ipad", "scale": "1x", "size": "76x76" },
+              { "filename": "Icon-iPad-76@2x.png", "idiom": "ipad", "scale": "2x", "size": "76x76" },
+              { "filename": "Icon-iPad-83.5@2x.png", "idiom": "ipad", "scale": "2x", "size": "83.5x83.5" },
+              { "filename": "Carat24-AppIcon-1024.png", "idiom": "ios-marketing", "scale": "1x", "size": "1024x1024" }
+            ],
+            "info": { "author": "xcode", "version": 1 }
+          }
+          JSON
+
       - name: Generate Xcode project
         run: xcodegen generate
 
