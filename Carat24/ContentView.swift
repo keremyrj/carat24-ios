@@ -25,6 +25,14 @@ struct ContentView: View {
         }
         .animation(.easeInOut(duration: 0.18), value: browser.showsBottomBar)
         .task { browser.start() }
+        .alert(item: $browser.availableUpdate) { update in
+            Alert(
+                title: Text("Yeni sürüm hazır"),
+                message: Text("Carat24 \(update.version) yayınlandı. En güncel özellikler için uygulamayı güncelleyin."),
+                primaryButton: .default(Text("App Store’da Güncelle"), action: browser.openAvailableUpdate),
+                secondaryButton: .cancel(Text("Daha sonra"))
+            )
+        }
     }
 }
 
@@ -101,4 +109,3 @@ private struct OfflineView: View {
         }
     }
 }
-
